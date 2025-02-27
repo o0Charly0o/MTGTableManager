@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizador de Mesas de Magic</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- jQuery y jQuery UI -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <!-- Nuestro script -->
+    <script src="js/script.js"></script>
+</head>
+<body>
+    <!-- Botón de hamburguesa -->
+    <button id="hamburger-button" class="hamburger-button">☰</button>
+
+    <!-- Botón para crear nueva ronda -->
+    <button id="nueva-ronda-button" class="button">Crear Nueva Ronda</button>
+
+    <div class="container">
+        <div id="formulario">
+            <h1>Organizador de Mesas de Magic</h1>
+            <div class="input-group">
+                <label for="names">Nombres y Apellidos (uno por línea):</label>
+                <textarea id="names" rows="10" placeholder="Ej:
+Juan Pérez
+Ana Gómez
+Luis Fernández"></textarea>
+            </div>
+            <div class="input-group">
+                <label for="tableSize">Tamaño de las mesas (2, 3 o 4):</label>
+                <input type="number" id="tableSize" min="2" max="4" value="4">
+            </div>
+            <button class="button" onclick="guardarNombres()">Guardar Nombres</button>
+        </div>
+        <div class="output">
+            <h2>Rondas:</h2>
+            <div id="rondas-container"></div>
+        </div>
+
+        <!-- Barra lateral para la clasificación -->
+        <div id="sidebar">
+            <h2>Clasificación</h2>
+            <ul id="clasificacion"></ul>
+        </div>
+    </div>
+</body>
+</html>

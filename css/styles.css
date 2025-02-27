@@ -1,0 +1,179 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    display: flex;
+    gap: 20px;
+    position: relative;
+}
+
+#hamburger-button {
+    display: block;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    border-radius: 4px;
+    z-index: 1000;
+}
+
+#hamburger-button:hover {
+    background-color: #218838;
+}
+
+#nueva-ronda-button {
+    display: block;
+    position: fixed;
+    top: 60px; /* Debajo del botón de hamburguesa */
+    left: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 4px;
+    z-index: 1000;
+}
+
+#nueva-ronda-button:hover {
+    background-color: #0056b3;
+}
+
+#formulario {
+    width: 60%;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.input-group {
+    margin-bottom: 10px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.input-group input,
+.input-group textarea {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.input-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.button:hover {
+    background-color: #218838;
+}
+
+.button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.output {
+    margin-top: 20px;
+    flex: 1;
+}
+
+.output h2 {
+    margin-bottom: 10px;
+}
+
+#rondas-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Espacio entre rondas */
+}
+
+.ronda {
+    border: 2px solid #ddd;
+    padding: 10px;
+    background-color: #f8f9fa;
+}
+
+.ronda h3 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.mesas-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Dos columnas para las mesas */
+    gap: 20px; /* Espacio entre mesas */
+}
+
+.mesa {
+    border: 2px solid #ddd;
+    padding: 10px;
+    background-color: #f8f9fa;
+}
+
+.mesa h4 {
+    margin: 0 0 5px 0;
+}
+
+.persona {
+    padding: 5px;
+    margin: 5px 0;
+    background-color: #e9ecef;
+    border: 1px solid #ccc;
+    cursor: move;
+}
+
+#sidebar {
+    width: 35%;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+#sidebar h2 {
+    margin-top: 0;
+}
+
+#clasificacion {
+    list-style-type: none;
+    padding: 0;
+}
+
+#clasificacion li {
+    background-color: #e9ecef;
+    padding: 10px;
+    margin-bottom: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
