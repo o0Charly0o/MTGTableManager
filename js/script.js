@@ -1,6 +1,3 @@
-let rondas = []; // Almacena todas las rondas
-let clasificacion = {}; // Almacena la clasificación de los jugadores
-
 // Función para guardar los nombres en el localStorage
 function guardarNombres() {
     const namesInput = document.getElementById('names').value;
@@ -11,142 +8,197 @@ function guardarNombres() {
         return;
     }
 
-    // Guardar los nombres en el localStorage
-    localStorage.setItem('nombres', JSON.stringify(namesArray));
-    alert('Nombres guardados correctamente.');
+    // Crear un array de objetos con la estructura { id: "ID", nombre: "Nombre", emparejamientos: [], posicion: null }
+    const jugadores = namesArray.map((nombre, index) => {
+        return {
+            id: `jugador-${index + 1}`, // ID único
+            nombre: nombre,
+            emparejamientos: [], // Inicializar emparejamientos como un array vacío
+            posicion: null // Inicializar posición como null
+        };
+    });
+
+    // Guardar el array de objetos en el localStorage
+    localStorage.setItem('jugadores', JSON.stringify(jugadores));
+    localStorage.setItem('rondas', JSON.stringify([]));
 
     // Crear la primera ronda
     crearRonda();
 }
 
+// Función para verificar si dos jugadores ya se han emparejado
+function hanJugadoJuntos(jugador1, jugador2) {
+    return jugador1.emparejamientos.includes(jugador2.id);
+}
+
 // Función para crear una nueva ronda
 function crearRonda() {
-    const nombresGuardados = localStorage.getItem('nombres');
-    if (!nombresGuardados) {
-        alert('No hay nombres guardados. Por favor, ingresa y guarda los nombres primero.');
+    const jugadoresGuardados = localStorage.getItem('jugadores');
+    let rondasGuardadas = JSON.parse(localStorage.getItem('rondas')) || []; // Inicializar como array vacío si no existe
+
+    if (!jugadoresGuardados) {
+        alert('No hay jugadores guardados. Por favor, ingresa y guarda los jugadores primero.');
         return;
     }
 
     const tableSize = parseInt(document.getElementById('tableSize').value);
-    const namesArray = JSON.parse(nombresGuardados);
+    const jugadores = JSON.parse(jugadoresGuardados);
 
     if (tableSize < 2 || tableSize > 4) {
         alert('El tamaño de las mesas debe ser 2, 3 o 4.');
         return;
     }
 
-    // Obtener los nombres sin números para la nueva ronda
-    const nombresSinNumeros = namesArray.map((nombre) => {
-        return nombre.replace(/^\d+\.\s/, ''); // Eliminar el número inicial si existe
-    });
+    // Mezclar la lista de jugadores
+    const jugadoresMezclados = jugadores.sort(() => Math.random() - 0.5);
 
-    // Mezclar la lista de nombres (sin números)
-    const shuffledNames = nombresSinNumeros.sort(() => Math.random() - 0.5);
-
-    // Crear las mesas
+    // Crear las mesas evitando emparejamientos repetidos
     const mesas = [];
-    for (let i = 0; i < shuffledNames.length; i += tableSize) {
-        mesas.push(shuffledNames.slice(i, i + tableSize));
+    const jugadoresSinEmparejar = [...jugadoresMezclados];
+
+    while (jugadoresSinEmparejar.length > 0) {
+        const jugadoresMesa = [];
+        const mesa = {};
+        const jugadorActual = jugadoresSinEmparejar.shift(); // Tomar el primer jugador disponible
+        jugadoresMesa.push(jugadorActual);
+
+        // Buscar jugadores que no hayan jugado con el jugadorActual
+        for (let i = 0; i < tableSize - 1 && jugadoresSinEmparejar.length > 0; i++) {
+            const jugadorSinEmparejar = jugadoresSinEmparejar.find(
+                (j) => !hanJugadoJuntos(jugadorActual, j)
+            );
+
+            if (jugadorSinEmparejar) {
+                jugadoresMesa.push(jugadorSinEmparejar);
+                jugadoresSinEmparejar.splice(jugadoresSinEmparejar.indexOf(jugadorSinEmparejar), 1);
+            } else {
+                // Si no hay jugadores disponibles que no hayan jugado con el jugadorActual,
+                // tomar cualquier jugador disponible
+                jugadoresMesa.push(jugadoresSinEmparejar.shift());
+            }
+        }
+
+        // Crear la mesa con los jugadores y el estado de resultado
+        mesa.jugadores = jugadoresMesa;
+        mesa.resultadoGuardado = false; // Usar booleano en lugar de cadena
+        mesas.push(mesa);
+
+        // Guardar los emparejamientos de cada jugador en la mesa
+        jugadoresMesa.forEach((jugador) => {
+            const emparejamientos = jugadoresMesa
+                .filter((j) => j.id !== jugador.id) // Excluir al propio jugador
+                .map((j) => j.id); // Obtener solo los IDs de los emparejamientos
+
+            // Añadir los nuevos emparejamientos al jugador
+            jugador.emparejamientos.push(...emparejamientos);
+        });
     }
 
-    // Guardar la ronda
-    rondas.push(mesas);
+    // Guardar los jugadores actualizados en el localStorage
+    localStorage.setItem('jugadores', JSON.stringify(jugadores));
+
+    // Guardar la ronda en rondasGuardadas
+    rondasGuardadas.push(mesas); // Añadir el array de mesas directamente
+    localStorage.setItem('rondas', JSON.stringify(rondasGuardadas)); // Guardar como JSON
 
     // Mostrar las rondas en el HTML
     mostrarRondas();
-
     // Inicializar drag and drop
     inicializarDragAndDrop();
 }
 
 // Función para mostrar las rondas en el HTML
 function mostrarRondas() {
-    const rondasContainer = document.getElementById('rondas-container');
-    rondasContainer.innerHTML = '';
+    const rondasGuardadas = JSON.parse(localStorage.getItem('rondas'))
+    const rondasContainer = document.getElementById('rondas-container')
+    rondasContainer.innerHTML = ''
 
-    rondas.forEach((ronda, indexRonda) => {
-        const rondaDiv = document.createElement('div');
-        rondaDiv.className = 'ronda';
-        rondaDiv.innerHTML = `<h3>Ronda ${indexRonda + 1}</h3>`;
+    rondasGuardadas.forEach((ronda, indexRonda) => {
+        const rondaDiv = document.createElement('div')
+        rondaDiv.className = 'ronda'
+        rondaDiv.innerHTML = `<h3>Ronda ${indexRonda + 1}</h3>`
 
-        const mesasContainer = document.createElement('div');
-        mesasContainer.className = 'mesas-container'; // Contenedor de 2 columnas
+        const mesasContainer = document.createElement('div')
+        mesasContainer.className = 'mesas-container' // Contenedor de 2 columnas
 
         ronda.forEach((mesa, indexMesa) => {
-            const mesaDiv = document.createElement('div');
-            mesaDiv.className = 'mesa';
-            mesaDiv.innerHTML = `<h4>Mesa ${indexMesa + 1}</h4>`;
+            const mesaDiv = document.createElement('div')
+            mesaDiv.className = 'mesa'
+            mesaDiv.innerHTML = `<h4>Mesa ${indexMesa + 1}</h4>`
 
-            mesa.forEach((persona) => {
-                const personaDiv = document.createElement('div');
-                personaDiv.className = 'persona';
-                // Mostrar el nombre sin números en la nueva ronda
-                if (indexRonda === rondas.length - 1) {
-                    personaDiv.textContent = persona; // Nueva ronda sin números
+            const resultadoGuardado = mesa.resultadoGuardado // Verificar si los resultados han sido guardados
+
+            mesa.jugadores.forEach((jugador, indexJugador) => {
+                const personaDiv = document.createElement('div')
+                personaDiv.className = 'persona'
+
+                if (resultadoGuardado) {
+                    personaDiv.textContent = `${indexJugador+1}. ${jugador.nombre}`
                 } else {
-                    // Mantener los números en las rondas anteriores
-                    personaDiv.textContent = persona;
+                    personaDiv.textContent = jugador.nombre
                 }
-                mesaDiv.appendChild(personaDiv);
-            });
+
+                mesaDiv.appendChild(personaDiv)
+            })
 
             // Botón para aplicar resultados (fuera del contenedor de la mesa)
-            const botonAplicarResultados = document.createElement('button');
-            botonAplicarResultados.textContent = 'Aplicar Resultados';
-            botonAplicarResultados.className = 'button';
-            botonAplicarResultados.onclick = () => aplicarResultados(mesaDiv, indexRonda, indexMesa);
+            const botonAplicarResultados = document.createElement('button')
+            botonAplicarResultados.textContent = 'Aplicar Resultados'
+            botonAplicarResultados.className = 'button'
+            botonAplicarResultados.onclick = () => aplicarResultados(mesaDiv, indexRonda, indexMesa)
 
             // Añadir la mesa y el botón al contenedor de la mesa
-            const mesaContainer = document.createElement('div');
-            mesaContainer.appendChild(mesaDiv);
-            mesaContainer.appendChild(botonAplicarResultados);
+            const mesaContainer = document.createElement('div')
+            mesaContainer.appendChild(mesaDiv)
+            mesaContainer.appendChild(botonAplicarResultados)
 
             // Añadir la mesa al contenedor de 2 columnas
-            mesasContainer.appendChild(mesaContainer);
-        });
+            mesasContainer.appendChild(mesaContainer)
+        })
 
         // Añadir el contenedor de mesas a la ronda
-        rondaDiv.appendChild(mesasContainer);
-        rondasContainer.appendChild(rondaDiv);
-    });
+        rondaDiv.appendChild(mesasContainer)
+        rondasContainer.appendChild(rondaDiv)
+    })
 
-    // Actualizar la clasificación
-    actualizarClasificacion();
+    inicializarDragAndDrop()
+    actualizarClasificacion()
 }
+
 
 // Función para aplicar resultados de una mesa
 function aplicarResultados(mesaDiv, indexRonda, indexMesa) {
-    const personas = [];
+    // Recuperar las rondas guardadas
+    const rondasGuardadas = JSON.parse(localStorage.getItem('rondas'));
+
+    // Verificar si la ronda y la mesa existen
+    if (!rondasGuardadas || !rondasGuardadas[indexRonda] || !rondasGuardadas[indexRonda][indexMesa]) {
+        alert('No se encontró la mesa especificada.');
+        return;
+    }
+
+    // Obtener la mesa específica
+    const mesa = rondasGuardadas[indexRonda][indexMesa];
+
+    // Obtener los jugadores ordenados de la mesa
+    const jugadoresOrdenados = [];
     $(mesaDiv).find('.persona').each(function() {
-        personas.push($(this).text().replace(/^\d+\.\s/, '')); // Eliminar el número inicial si existe
+        jugadoresOrdenados.push($(this).text().replace(/^\d+\.\s/, '')); // Eliminar el número inicial si existe
     });
 
-    // Reiniciar los puntos de los jugadores en esta mesa (para evitar duplicados)
-    const tableSize = parseInt(document.getElementById('tableSize').value);
-    personas.forEach((persona) => {
-        if (clasificacion[persona]) {
-            // Restar los puntos anteriores de esta mesa
-            clasificacion[persona] -= (tableSize - personas.indexOf(persona));
-        }
+    // Actualizar el orden de los jugadores en la mesa
+    mesa.jugadores = jugadoresOrdenados.map((nombre) => {
+        return mesa.jugadores.find((j) => j.nombre === nombre);
     });
 
-    // Asignar nuevas posiciones y puntos
-    personas.forEach((persona, index) => {
-        const puntos = tableSize - index;
-        if (!clasificacion[persona]) {
-            clasificacion[persona] = 0;
-        }
-        clasificacion[persona] += puntos;
-    });
+    // Marcar la mesa como calculada
+    mesa.resultadoGuardado = true;
 
-    // Mostrar las posiciones en la mesa
-    $(mesaDiv).find('.persona').each(function(index) {
-        const nombre = $(this).text().replace(/^\d+\.\s/, ''); // Eliminar el número inicial
-        $(this).text(`${index + 1}. ${nombre}`); // Asignar el nuevo número
-    });
-
-    // Actualizar la clasificación
-    actualizarClasificacion();
+    // Guardar los cambios en el localStorage
+    localStorage.setItem('rondas', JSON.stringify(rondasGuardadas));
+    
+    // Actualizar la interfaz
+    mostrarRondas();
 }
 
 // Función para inicializar drag and drop
@@ -187,39 +239,64 @@ function inicializarDragAndDrop() {
             }
 
             // Actualizar el estado de las rondas
-            actualizarEstadoRondas();
+            // actualizarEstadoRondas();
         }
     });
 }
 
 // Función para actualizar el estado de las rondas
-function actualizarEstadoRondas() {
-    const nuevasRondas = [];
-    $('#rondas-container .ronda').each(function() {
-        const mesas = [];
-        $(this).find('.mesa').each(function() {
-            const personas = [];
-            $(this).find('.persona').each(function() {
-                personas.push($(this).text().replace(/^\d+\.\s/, '')); // Eliminar el número inicial
-            });
-            mesas.push(personas);
-        });
-        nuevasRondas.push(mesas);
-    });
-
-    rondas = nuevasRondas;
-}
+// function actualizarEstadoRondas() {
+//     const nuevasRondas = [];
+//     $('#rondas-container .ronda').each(function() {
+//         const mesas = [];
+//         $(this).find('.mesa').each(function() {
+//             const personas = [];
+//             $(this).find('.persona').each(function() {
+//                 personas.push($(this).text().replace(/^\d+\.\s/, '')); // Eliminar el número inicial
+//             });
+//             mesas.push(personas);
+//         });
+//         nuevasRondas.push(mesas);
+//     });
+//
+//     rondas = nuevasRondas;
+// }
 
 // Función para actualizar la clasificación
 function actualizarClasificacion() {
+    const rondasGuardadas = JSON.parse(localStorage.getItem('rondas'));
+    let clasificacion = [];
+    let indexClasificacion = 0;
+    rondasGuardadas.forEach((ronda, indexRonda) => {
+        ronda.forEach((mesa, indexMesa) => {
+            if(mesa.resultadoGuardado){
+                mesa.jugadores.forEach((jugador, indexJugador) => {
+                    jugador.posicion = indexJugador + 1;
+
+                    //save on clasificacion an array the player name and points that must be 4 - position the key must be the id of jugador like clasificacion[jugador.id] = ['nombre' => jugador.nombre , 'puntos' => 4 - jugador.posicion];
+                    if (clasificacion[jugador.id] === undefined) {
+                        clasificacion[jugador.id] = { 'nombre': jugador.nombre, 'puntos': 5 - jugador.posicion };
+                    }else{
+                         clasificacion[jugador.id]['puntos'] = clasificacion[jugador.id]['puntos'] + 5 - jugador.posicion  ;
+                    }
+                });
+            }
+        });
+    });
+
+    const sortedClasificacion = Object.entries(clasificacion).sort((a, b) => b[1].puntos - a[1].puntos);
+
+    // Update the clasificacion with the sorted entries
+    clasificacion = Object.fromEntries(sortedClasificacion);
+
+
     const clasificacionList = document.getElementById('clasificacion');
     clasificacionList.innerHTML = '';
 
-    const sortedClasificacion = Object.entries(clasificacion).sort((a, b) => b[1] - a[1]);
 
-    sortedClasificacion.forEach(([nombre, puntos]) => {
+    sortedClasificacion.forEach(([id, jugador]) => {
         const li = document.createElement('li');
-        li.textContent = `${nombre}: ${puntos} puntos`;
+        li.textContent = `${jugador.nombre}: ${jugador.puntos} puntos`;
         clasificacionList.appendChild(li);
     });
 }
@@ -242,11 +319,12 @@ $(document).ready(function() {
     });
 
     // Cargar los nombres y el histórico al cargar la página
-    const nombresGuardados = localStorage.getItem('nombres');
+    const nombresGuardados = localStorage.getItem('jugadores');
+    const rondasGuardadas = localStorage.getItem('rondas');
     if (nombresGuardados) {
         const namesInput = document.getElementById('names');
-        namesInput.value = JSON.parse(nombresGuardados).join('\n');
-        crearRonda();
+        namesInput.value = JSON.parse(nombresGuardados).map(j => j.nombre).join('\n');
+        mostrarRondas();
     }
 
     // Ocultar el formulario al inicio

@@ -1,29 +1,64 @@
+@font-face {
+    font-family: Enchanted_Land;
+    src: url("fonts/enchanted_land.otf") format("opentype");
+}
+
+html{
+        /* background-image: url(../img/background-castle.png); */
+        /* background-color: transparent; */
+        /* background-size: cover; */
+}
+
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
+    background-image: url(../img/background-castle.png);
+    background-color: #00afff2b;
+    background-size: 100%;
     padding: 0;
+    justify-content: flex-start;
+    /* min-height: 100vh; */
+    font-family: Enchanted_Land;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    background-color: #f0f0f0;
+    flex-direction: column;
+    width: 1555px;
+    margin: 0 auto;
+    background-repeat: no-repeat;
+    max-height: 100vh;
+    height: 100%;
 }
 
-.container {
-    width: 90%;
-    max-width: 1200px;
-    background-color: white;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    display: flex;
-    gap: 20px;
+header.container{
     position: relative;
+    width: 100%;
+    max-width: 100%;
+}
+.container {
+    width: 100%;
+    max-width: 100%;
+    background-color: transparent;
+    padding: 20px;
+    border-radius: 8px;
+    gap: 20px;
+    max-height: calc(100vh - 173px);
+    position: relative;
+    top: 0;
 }
 
+.wrapper-container {
+    /* position: absolute; */
+    /* top: 200px; */
+    /* position: relative; */
+    /* top: 0; */
+}
+.header-buttons{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
 #hamburger-button {
     display: block;
-    position: fixed;
+    /* position: fixed; */
     top: 10px;
     left: 10px;
     background-color: #28a745;
@@ -41,11 +76,9 @@ body {
 }
 
 #nueva-ronda-button {
-    display: block;
-    position: fixed;
-    top: 60px; /* Debajo del botón de hamburguesa */
-    left: 10px;
-    background-color: #007bff;
+    display: grid;
+     /* Debajo del botón de hamburguesa */
+    border: #007bff;
     color: white;
     border: none;
     padding: 10px;
@@ -53,6 +86,9 @@ body {
     font-size: 16px;
     border-radius: 4px;
     z-index: 1000;
+    text-align: left;
+    margin: 0;
+    margin-top: 10px;
 }
 
 #nueva-ronda-button:hover {
@@ -60,7 +96,7 @@ body {
 }
 
 #formulario {
-    width: 60%;
+    width: 100%;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
@@ -87,15 +123,20 @@ body {
 
 .button {
     padding: 10px 20px;
-    background-color: #28a745;
+    background-color: black;
     color: white;
     border: none;
     cursor: pointer;
     margin-right: 10px;
+    font-family: inherit;
+    font-size: 22px;
+    border-radius: 8px;
+    margin: 0 auto;
+    display: block;
 }
 
 .button:hover {
-    background-color: #218838;
+    background-color: grey;
 }
 
 .button:disabled {
@@ -104,14 +145,22 @@ body {
 }
 
 .output {
-    margin-top: 20px;
     flex: 1;
+    overflow-y: scroll;
+    padding-top: 50px;
+    padding-bottom: 50px;
 }
 
-.output h2 {
+h2.rounds {
     margin-bottom: 10px;
+    font-size: 59px;
+    margin: 0;
 }
-
+.wrapper{
+    display: flex;
+    flex-direction: row;
+    max-height: calc(100vh - 222px);
+}
 #rondas-container {
     display: flex;
     flex-direction: column;
@@ -119,14 +168,17 @@ body {
 }
 
 .ronda {
-    border: 2px solid #ddd;
-    padding: 10px;
-    background-color: #f8f9fa;
+    padding: 52px 55px 101px;
+    background-image: url(../img/ronda.png);
+    background-size: 100% 100%;
+    background-color: transparent;
 }
 
 .ronda h3 {
     margin-top: 0;
     text-align: center;
+    font-size: 62px;
+    margin-bottom: 10px;
 }
 
 .mesas-container {
@@ -135,45 +187,77 @@ body {
     gap: 20px; /* Espacio entre mesas */
 }
 
+.mesas-container > div {
+    background-image: url(../img/mesa.png);
+    /* height: 287px; */
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    padding: 32px;
+}
+
 .mesa {
-    border: 2px solid #ddd;
+    /* border: 2px solid #ddd; */
     padding: 10px;
-    background-color: #f8f9fa;
+    /* background-color: #f8f9fa; */
 }
 
 .mesa h4 {
     margin: 0 0 5px 0;
+    font-size: 26px;
+    color: white;
+    text-align: center;
+    border-bottom: 2px solid white;
 }
 
 .persona {
     padding: 5px;
     margin: 5px 0;
-    background-color: #e9ecef;
-    border: 1px solid #ccc;
+    color: white;
+    /* background-color: #e9ecef; */
+    /* border: 1px solid #ccc; */
     cursor: move;
+    font-size: 36px;
+    text-align: center;
+    border-bottom: 1px solid #ffffff38;
 }
 
 #sidebar {
     width: 35%;
-    background-color: #f8f9fa;
-    padding: 10px;
-    border: 1px solid #ddd;
+    background-color: transparent;
     border-radius: 8px;
+    background-image: url(../img/classification-table.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    padding: 0 68px;
 }
 
 #sidebar h2 {
     margin-top: 0;
+    font-size: 55px;
+    line-height: 132px;
+    text-align: center;
+    color: white;
+    margin-bottom: 25px;
 }
 
 #clasificacion {
     list-style-type: none;
     padding: 0;
+    text-align: center;
 }
 
 #clasificacion li {
-    background-color: #e9ecef;
+    background-color: transparent;
     padding: 10px;
     margin-bottom: 5px;
-    border: 1px solid #ccc;
     border-radius: 4px;
+    font-size: 37px;
+    background-image: url(../img/pergamino.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 348px;
+    text-align: center;
+    background-position: center;
+    display: inline-block;
+    margin-bottom: 10px;
 }
